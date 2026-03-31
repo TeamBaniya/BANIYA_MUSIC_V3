@@ -25,8 +25,8 @@ class Config:
         self.SESSION2 = getenv("SESSION2", None)
         self.SESSION3 = getenv("SESSION3", None)
 
-        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/ArcUpdates")
-        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/ArcChatz")
+        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/baniya_Updates")
+        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/baniya_support")
 
         self.AUTO_LEAVE: bool = getenv("AUTO_LEAVE", "False").lower() == "false"
         self.AUTO_END: bool = getenv("AUTO_END", "False").lower() == "true"
