@@ -7,6 +7,6 @@ venv/
 cache/
 downloads/
 __pycache__/
-anony/cookies/*.txt
+BANIYA_V3/cookies/*.txt
 *.session
 *.session-journal
