@@ -10,29 +10,26 @@ class Config:
 
         self.BOT_TOKEN = getenv("BOT_TOKEN")
         self.MONGO_URL = getenv("MONGO_URL")
-        self.DB_NAME = getenv("DB_NAME")
-        self.DB_URI = getenv("DB_URI")
-        
-        self.MEDIA_CHANNEL_ID = int(getenv("MEDIA_CHANNEL_ID", 0))
+
         self.LOGGER_ID = int(getenv("LOGGER_ID", 0))
         self.OWNER_ID = int(getenv("OWNER_ID", 0))
 
-        self.DURATION_LIMIT = int(getenv("DURATION_LIMIT", 120)) * 60
+        self.DURATION_LIMIT = int(getenv("DURATION_LIMIT", 60)) * 60
         self.QUEUE_LIMIT = int(getenv("QUEUE_LIMIT", 20))
         self.PLAYLIST_LIMIT = int(getenv("PLAYLIST_LIMIT", 20))
 
-        self.SESSION1 = getenv("SESSION", None)
+        self.SESSION1 = getenv("SESSION",  None)
         self.SESSION2 = getenv("SESSION2", None)
         self.SESSION3 = getenv("SESSION3", None)
 
-        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/SparshUpdate")
-        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/SparshSupport")
+        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/nobmz")
+        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/nobmz")
 
-        self.AUTO_LEAVE: bool = getenv("AUTO_LEAVE", "False").lower() == "false"
+        self.AUTO_LEAVE: bool = getenv("AUTO_LEAVE", "False").lower() == "true"
         self.AUTO_END: bool = getenv("AUTO_END", "False").lower() == "true"
     
         self.THUMB_GEN: bool = getenv("THUMB_GEN", "True").lower() == "true"
-        self.VIDEO_PLAY: bool = getenv("VIDEO_PLAY", "True").lower() == "false"
+        self.VIDEO_PLAY: bool = getenv("VIDEO_PLAY", "True").lower() == "true"
 
         self.LANG_CODE = getenv("LANG_CODE", "en")
 
@@ -40,11 +37,9 @@ class Config:
             url for url in getenv("COOKIES_URL", "").split(" ")
             if url and "batbin.me" in url
         ]
-        self.DEFAULT_THUMB = getenv("DEFAULT_THUMB", "https://te.legra.ph/file/3e40a408286d4eda24191.jpg")
-        self.PING_IMG = getenv("PING_IMG", "https://graph.org/file/435ed435b4f3a081851f0-2fd05cdcf10fc95637.jpg")
-        self.START_IMG = getenv("START_IMG", "https://graph.org/file/d7204bb54382e6906f212-4cd99af24b3a2a2c2a.jpg")
-        self.API_KEY = getenv("API_KEY")  # @FallenApiBot send cmd /apikey
-        self.API_URL = getenv("API_URL", "https://api.deadlinetech.site")
+        self.DEFAULT_THUMB = getenv("DEFAULT_THUMB", "https://files.catbox.moe/psc94w.jpg")
+        self.PING_IMG = getenv("PING_IMG", "https://files.catbox.moe/psc94w.jpg")
+        self.START_IMG = getenv("START_IMG", "https://files.catbox.moe/psc94w.jpg")
 
     def check(self):
         missing = [
