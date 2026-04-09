@@ -74,6 +74,28 @@ class MongoDB:
         )
         self.lang[chat_id] = lang_code
         
+        # ------------------ PLAY MODE METHODS ------------------
+
+    async def get_play_mode(self, chat_id: int) -> bool:
+        if chat_id not in self.admin_play:
+            doc = await self.chatsdb.find_one({"_id": chat_id})
+            if doc and doc.get("admin_play"):
+                self.admin_play.append(chat_id)
+        return chat_id in self.admin_play
+
+    async def set_play_mode(self, chat_id: int, remove: bool = False) -> None:
+        if remove and chat_id in self.admin_play:
+            self.admin_play.remove(chat_id)
+        else:
+            if chat_id not in self.admin_play:
+                self.admin_play.append(chat_id)
+
+        await self.chatsdb.update_one(
+            {"_id": chat_id},
+            {"$set": {"admin_play": not remove}},
+            upsert=True,
+        )
+        
     # ------------------ MIGRATION FIXED ------------------
 
     async def migrate_coll(self):
