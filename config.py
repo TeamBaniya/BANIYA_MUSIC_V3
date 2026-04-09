@@ -12,7 +12,8 @@ class Config:
 
         # 🗄️ Database
         self.MONGO_URL = getenv("MONGO_URL")
-        self.DB_NAME = getenv("DB_NAME", "baniya_v3")  # ✅ FIXED
+        self.DB_URI = self.MONGO_URL   # ✅ FINAL FIX (IMPORTANT)
+        self.DB_NAME = getenv("DB_NAME", "baniya_v3")
 
         # 👑 Owner & Logs
         self.LOGGER_ID = int(getenv("LOGGER_ID", 0))
@@ -60,7 +61,7 @@ class Config:
                 "API_HASH",
                 "BOT_TOKEN",
                 "MONGO_URL",
-                "DB_NAME",   # ✅ Added here also
+                "DB_NAME",
                 "LOGGER_ID",
                 "OWNER_ID",
                 "SESSION1"
