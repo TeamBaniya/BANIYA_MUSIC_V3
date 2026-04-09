@@ -1,9 +1,10 @@
-# Copyright (c) 2025 BANIYA_V3mousX1025
+# Copyright (c) 2025 BANIYA_V3
 # Licensed under the MIT License.
-# This file is part of AnonXMusic
+# This file is part of BANIYA_V3
 
 import asyncio
 from pyrogram import enums, filters, types
+from pyrogram.errors import FloodWait, MediaEmpty
 
 from BANIYA_V3 import app, config, db, lang
 from BANIYA_V3.helpers import buttons, utils
@@ -22,8 +23,12 @@ async def _help(_, m: types.Message):
 @app.on_message(filters.command(["start"]))
 @lang.language()
 async def start(_, message: types.Message):
-    if message.from_user.id in app.bl_users and message.from_user.id not in db.notified:
-        return await message.reply_text(message.lang["bl_user_notify"])
+    # Handle blacklisted users
+    if message.from_user.id in app.bl_users:
+        if message.from_user.id not in db.notified:
+            db.notified.append(message.from_user.id)
+            return await message.reply_text(message.lang["bl_user_notify"])
+        return
 
     if len(message.command) > 1 and message.command[1] == "help":
         return await _help(_, message)
@@ -36,23 +41,48 @@ async def start(_, message: types.Message):
     )
 
     key = buttons.start_key(message.lang, private)
-    await message.reply_photo(
-        photo=config.START_IMG,
-        caption=_text,
-        reply_markup=key,
-        quote=not private,
-    )
+    
+    # Handle photo send with error handling
+    try:
+        await message.reply_photo(
+            photo=config.START_IMG,
+            caption=_text,
+            reply_markup=key,
+            quote=not private,
+        )
+    except FloodWait as e:
+        await asyncio.sleep(e.value)
+        await message.reply_photo(
+            photo=config.START_IMG,
+            caption=_text,
+            reply_markup=key,
+            quote=not private,
+        )
+    except (MediaEmpty, ValueError) as e:
+        logger.error(f"Invalid START_IMG: {config.START_IMG}")
+        # Fallback to text message
+        await message.reply_text(
+            text=_text,
+            reply_markup=key,
+            quote=not private,
+        )
+    except Exception as e:
+        logger.error(f"Failed to send start message: {e}")
+        await message.reply_text(
+            text=_text,
+            reply_markup=key,
+            quote=not private,
+        )
 
+    # Add user/chat to database
     if private:
-        if await db.is_user(message.from_user.id):
-            return
-        await utils.send_log(message)
-        await db.add_user(message.from_user.id)
+        if not await db.is_user(message.from_user.id):
+            await utils.send_log(message)
+            await db.add_user(message.from_user.id)
     else:
-        if await db.is_chat(message.chat.id):
-            return
-        await utils.send_log(message, True)
-        await db.add_chat(message.chat.id)
+        if not await db.is_chat(message.chat.id):
+            await utils.send_log(message, True)
+            await db.add_chat(message.chat.id)
 
 
 @app.on_message(filters.command(["playmode", "settings"]) & filters.group & ~app.bl_users)
