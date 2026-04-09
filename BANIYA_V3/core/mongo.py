@@ -142,7 +142,43 @@ class MongoDB:
     async def get_chats(self):
         return self.chats
 
-        # ------------------ SUDO METHODS ------------------
+           # ------------------ BLACKLIST METHODS ------------------
+
+    async def get_blacklisted(self, chat: bool = False) -> list[int]:
+        if chat:
+            doc = await self.cache.find_one({"_id": "bl_chats"})
+            return doc.get("chat_ids", []) if doc else []
+        
+        doc = await self.cache.find_one({"_id": "bl_users"})
+        return doc.get("user_ids", []) if doc else []
+
+    async def add_blacklist(self, chat_id: int) -> None:
+        if str(chat_id).startswith("-"):
+            await self.cache.update_one(
+                {"_id": "bl_chats"},
+                {"$addToSet": {"chat_ids": chat_id}},
+                upsert=True
+            )
+        else:
+            await self.cache.update_one(
+                {"_id": "bl_users"},
+                {"$addToSet": {"user_ids": chat_id}},
+                upsert=True
+            )
+
+    async def del_blacklist(self, chat_id: int) -> None:
+        if str(chat_id).startswith("-"):
+            await self.cache.update_one(
+                {"_id": "bl_chats"},
+                {"$pull": {"chat_ids": chat_id}}
+            )
+        else:
+            await self.cache.update_one(
+                {"_id": "bl_users"},
+                {"$pull": {"user_ids": chat_id}}
+            )
+            
+    # ------------------ SUDO METHODS ------------------
 
     async def get_sudoers(self) -> list[int]:
         doc = await self.cache.find_one({"_id": "sudoers"})
