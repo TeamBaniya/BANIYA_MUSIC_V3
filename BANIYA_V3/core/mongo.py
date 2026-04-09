@@ -58,6 +58,22 @@ class MongoDB:
         await self.media_mongo.close()
         logger.info("Database closed")
 
+       # ------------------ LANGUAGE METHODS ------------------
+
+    async def get_lang(self, chat_id: int) -> str:
+        if chat_id not in self.lang:
+            doc = await self.langdb.find_one({"_id": chat_id})
+            self.lang[chat_id] = doc["lang"] if doc else config.LANG_CODE
+        return self.lang[chat_id]
+
+    async def set_lang(self, chat_id: int, lang_code: str):
+        await self.langdb.update_one(
+            {"_id": chat_id},
+            {"$set": {"lang": lang_code}},
+            upsert=True,
+        )
+        self.lang[chat_id] = lang_code
+        
     # ------------------ MIGRATION FIXED ------------------
 
     async def migrate_coll(self):
