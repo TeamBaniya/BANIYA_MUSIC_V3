@@ -142,6 +142,25 @@ class MongoDB:
     async def get_chats(self):
         return self.chats
 
+        # ------------------ SUDO METHODS ------------------
+
+    async def get_sudoers(self) -> list[int]:
+        doc = await self.cache.find_one({"_id": "sudoers"})
+        return doc.get("user_ids", []) if doc else []
+
+    async def add_sudo(self, user_id: int) -> None:
+        await self.cache.update_one(
+            {"_id": "sudoers"},
+            {"$addToSet": {"user_ids": user_id}},
+            upsert=True
+        )
+
+    async def del_sudo(self, user_id: int) -> None:
+        await self.cache.update_one(
+            {"_id": "sudoers"},
+            {"$pull": {"user_ids": user_id}}
+        )
+        
     # ------------------ AUTH ------------------
 
     async def add_auth(self, chat_id, user_id):
