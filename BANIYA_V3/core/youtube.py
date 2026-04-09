@@ -7,8 +7,8 @@ import aiohttp
 from pathlib import Path
 
 from py_yt import Playlist, VideosSearch
-from anony import logger
-from anony.helpers import Track, utils
+from BANIYA_V3 import logger
+from BANIYA_V3.helpers import Track, utils
 
 # Fast Download API
 API_URL = "https://shrutibots.site"
