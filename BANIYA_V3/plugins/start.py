@@ -3,11 +3,15 @@
 # This file is part of BANIYA_V3
 
 import asyncio
+import logging
 from pyrogram import enums, filters, types
 from pyrogram.errors import FloodWait, MediaEmpty
 
 from BANIYA_V3 import app, config, db, lang
 from BANIYA_V3.helpers import buttons, utils
+
+# Create logger instance
+logger = logging.getLogger(__name__)
 
 
 @app.on_message(filters.command(["help"]) & filters.private & ~app.bl_users)
