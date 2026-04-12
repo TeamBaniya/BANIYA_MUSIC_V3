@@ -70,3 +70,7 @@ class Config:
         ]
         if missing:
             raise SystemExit(f"Missing required environment variables: {', '.join(missing)}")
+
+# Create config instance
+config = Config()
+config.check()
