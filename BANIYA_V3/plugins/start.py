@@ -1,238 +1,85 @@
-# Copyright (c) 2025 BANIYA_V3mousX1025
+# Copyright (c) 2025 AnonymousX1025
 # Licensed under the MIT License.
 # This file is part of AnonXMusic
 
-from pyrogram import types, enums, filters
-from pyrogram.types import Message
-from BANIYA_V3 import app, config, lang
-from BANIYA_V3.core.lang import lang_codes
+import asyncio
+from pyrogram import enums, filters, types
+
+from BANIYA_V3 import app, config, db, lang
+from BANIYA_V3.helpers import buttons, utils
 
 
-class Inline:
-    def __init__(self):
-        self.ikm = types.InlineKeyboardMarkup
-        self.ikb = types.InlineKeyboardButton
-
-    def cancel_dl(self, text) -> types.InlineKeyboardMarkup:
-        return self.ikm([[self.ikb(text=text, callback_data=f"cancel_dl", style=enums.ButtonStyle.DANGER)]])
-
-    def controls(
-        self,
-        chat_id: int,
-        status: str = None,
-        timer: str = None,
-        remove: bool = False,
-    ) -> types.InlineKeyboardMarkup:
-        keyboard = []
-        if status:
-            keyboard.append(
-                [self.ikb(text=status, callback_data=f"controls status {chat_id}", style=enums.ButtonStyle.DEFAULT)]
-            )
-        elif timer:
-            keyboard.append(
-                [self.ikb(text=timer, callback_data=f"controls status {chat_id}", style=enums.ButtonStyle.DEFAULT)]
-            )
-
-        if not remove:
-            keyboard.append(
-                [
-                    self.ikb(text="▷", callback_data=f"controls resume {chat_id}", style=enums.ButtonStyle.PRIMARY),
-                    self.ikb(text="II", callback_data=f"controls pause {chat_id}", style=enums.ButtonStyle.PRIMARY),
-                    self.ikb(text="⥁", callback_data=f"controls replay {chat_id}", style=enums.ButtonStyle.DEFAULT),
-                    self.ikb(text="‣‣I", callback_data=f"controls skip {chat_id}", style=enums.ButtonStyle.DEFAULT),
-                    self.ikb(text="▢", callback_data=f"controls stop {chat_id}", style=enums.ButtonStyle.DANGER),
-                ]
-            )
-        return self.ikm(keyboard)
-
-    def help_markup(
-        self, _lang: dict, back: bool = False
-    ) -> types.InlineKeyboardMarkup:
-        if back:
-            rows = [
-                [
-                    self.ikb(text=_lang["back"], callback_data="help back", style=enums.ButtonStyle.PRIMARY),
-                    self.ikb(text=_lang["close"], callback_data="help close", style=enums.ButtonStyle.DANGER),
-                ]
-            ]
-        else:
-            cbs = ["admins", "auth", "blist", "lang", "ping", "play", "queue", "stats", "sudo"]
-            buttons = [
-                self.ikb(text=_lang[f"help_{i}"], callback_data=f"help {cb}", style=enums.ButtonStyle.PRIMARY)
-                for i, cb in enumerate(cbs)
-            ]
-            rows = [buttons[i : i + 3] for i in range(0, len(buttons), 3)]
-
-        return self.ikm(rows)
-
-    def lang_markup(self, _lang: str) -> types.InlineKeyboardMarkup:
-        langs = lang.get_languages()
-
-        buttons = [
-            self.ikb(
-                text=f"{name} ({code}) {'✔️' if code == _lang else ''}",
-                callback_data=f"lang_change {code}",
-                style=enums.ButtonStyle.PRIMARY if code == _lang else enums.ButtonStyle.DANGER,
-            )
-            for code, name in langs.items()
-        ]
-        rows = [buttons[i : i + 2] for i in range(0, len(buttons), 2)]
-        return self.ikm(rows)
-
-    def ping_markup(self, text: str) -> types.InlineKeyboardMarkup:
-        return self.ikm([[self.ikb(text=text, url=config.SUPPORT_CHAT, style=enums.ButtonStyle.PRIMARY)]])
-
-    def play_queued(
-        self, chat_id: int, item_id: str, _text: str
-    ) -> types.InlineKeyboardMarkup:
-        return self.ikm(
-            [
-                [
-                    self.ikb(
-                        text=_text, callback_data=f"controls force {chat_id} {item_id}", style=enums.ButtonStyle.DANGER
-                    )
-                ]
-            ]
-        )
-
-    def queue_markup(
-        self, chat_id: int, _text: str, playing: bool
-    ) -> types.InlineKeyboardMarkup:
-        _action = "pause" if playing else "resume"
-        return self.ikm(
-            [[self.ikb(text=_text, callback_data=f"controls {_action} {chat_id} q", style=enums.ButtonStyle.PRIMARY)]]
-        )
-
-    def settings_markup(
-        self, lang: dict, admin_only: bool, cmd_delete: bool, language: str, chat_id: int
-    ) -> types.InlineKeyboardMarkup:
-        return self.ikm(
-            [
-                [
-                    self.ikb(
-                        text=lang["play_mode"] + " ➜",
-                        callback_data="settings",
-                        style=enums.ButtonStyle.DEFAULT,
-                    ),
-                    self.ikb(text=admin_only, callback_data="settings play", style=enums.ButtonStyle.PRIMARY),
-                ],
-                [
-                    self.ikb(
-                        text=lang["cmd_delete"] + " ➜",
-                        callback_data="settings",
-                        style=enums.ButtonStyle.DEFAULT,
-                    ),
-                    self.ikb(text=cmd_delete, callback_data="settings delete", style=enums.ButtonStyle.PRIMARY),
-                ],
-                [
-                    self.ikb(
-                        text=lang["language"] + " ➜",
-                        callback_data="settings",
-                        style=enums.ButtonStyle.DEFAULT,
-                    ),
-                    self.ikb(text=lang_codes[language], callback_data="language", style=enums.ButtonStyle.PRIMARY),
-                ],
-            ]
-        )
-
-    def start_key(
-        self, lang: dict, private: bool = False
-    ) -> types.InlineKeyboardMarkup:
-        rows = [
-            [
-                self.ikb(
-                    text=lang["add_me"],
-                    url=f"https://t.me/{app.username}?startgroup=true",
-                    style=enums.ButtonStyle.PRIMARY,
-                    icon_custom_emoji_id=5882207227997066107,
-                )
-            ],
-            [self.ikb(text=lang["help"], callback_data="help", style=enums.ButtonStyle.DEFAULT, icon_custom_emoji_id=5942734685976138521)],
-            [
-                self.ikb(text=lang["support"], url=config.SUPPORT_CHAT, style=enums.ButtonStyle.DANGER, icon_custom_emoji_id=6037421444789440735),
-                self.ikb(text=lang["channel"], url=config.SUPPORT_CHANNEL, style=enums.ButtonStyle.DANGER, icon_custom_emoji_id=6021418126061605425),
-            ],
-        ]
-        if private:
-            rows += [
-                [
-                    self.ikb(
-                        text=lang["source"],
-                        url="https://t.me/oye_sparsh",
-                        style=enums.ButtonStyle.DANGER,
-                        icon_custom_emoji_id=5983580310292402968,
-                    )
-                ]
-            ]
-        else:
-            rows += [[self.ikb(text=lang["language"], callback_data="language", style=enums.ButtonStyle.DANGER, icon_custom_emoji_id=5884479287171485878)]]
-        return self.ikm(rows)
-
-    def yt_key(self, link: str) -> types.InlineKeyboardMarkup:
-        return self.ikm(
-            [
-                [
-                    self.ikb(text="❐", copy_text=link, style=enums.ButtonStyle.DEFAULT),
-                    self.ikb(text="Youtube", url=link, style=enums.ButtonStyle.PRIMARY),
-                ],
-            ]
-        )
+@app.on_message(filters.command(["help"]) & filters.private & ~app.bl_users)
+@lang.language()
+async def _help(_, m: types.Message):
+    await m.reply_text(
+        text=m.lang["help_menu"],
+        reply_markup=buttons.help_markup(m.lang),
+        quote=True,
+    )
 
 
-# ============ START COMMAND HANDLER ============
-@app.on_message(filters.command("start") & filters.private)
-async def start_command(client, message: Message):
-    """Handler for /start command"""
-    try:
-        user = message.from_user
-        user_name = user.first_name or user.username or "User"
-        
-        # Get language
-        try:
-            from BANIYA_V3.core.lang import get_lang
-            _lang = get_lang(message.chat.id)
-        except:
-            _lang = {"welcome": "Welcome", "help": "Help", "add_me": "Add me to group"}
-        
-        # Welcome message
-        welcome_text = f"""
-**🎵 Welcome {user_name}! 🎵**
+@app.on_message(filters.command(["start"]))
+@lang.language()
+async def start(_, message: types.Message):
+    if message.from_user.id in app.bl_users and message.from_user.id not in db.notified:
+        return await message.reply_text(message.lang["bl_user_notify"])
 
-**BANIYA Music Bot is here to play high-quality music in your voice chats!**
+    if len(message.command) > 1 and message.command[1] == "help":
+        return await _help(_, message)
 
-**✨ Features:**
-• Play songs from YouTube
-• Queue system with controls
-• 24/7 playback
-• Multi-language support
+    private = message.chat.type == enums.ChatType.PRIVATE
+    _text = (
+        message.lang["start_pm"].format(message.from_user.first_name, app.name)
+        if private
+        else message.lang["start_gp"].format(app.name)
+    )
 
-**📌 Commands:**
-• /play <song> - Play a song
-• /skip - Skip current song  
-• /pause - Pause playback
-• /resume - Resume playback
-• /stop - Stop playback
-• /help - Show all commands
+    key = buttons.start_key(message.lang, private)
+    await message.reply_photo(
+        photo=config.START_IMG,
+        caption=_text,
+        reply_markup=key,
+        quote=not private,
+    )
 
-**🔗 Useful Links:**
-[Support Chat]({config.SUPPORT_CHAT}) | [Channel]({config.SUPPORT_CHANNEL})
+    if private:
+        if await db.is_user(message.from_user.id):
+            return
+        await utils.send_log(message)
+        await db.add_user(message.from_user.id)
+    else:
+        if await db.is_chat(message.chat.id):
+            return
+        await utils.send_log(message, True)
+        await db.add_chat(message.chat.id)
 
-**🚀 Add me to your group and make me admin to start playing!**
-"""
-        
-        # Create inline keyboard
-        inline = Inline()
-        reply_markup = inline.start_key(_lang, private=True)
-        
-        await message.reply_text(
-            welcome_text,
-            reply_markup=reply_markup,
-            disable_web_page_preview=True
-        )
-        
-    except Exception as e:
-        print(f"Error in start command: {e}")
-        await message.reply_text(
-            f"**Hello {message.from_user.first_name}!**\n\nWelcome to BANIYA Music Bot!\n\nSend /help for commands."
-        )
-# ============ END START COMMAND HANDLER ============
+
+@app.on_message(filters.command(["playmode", "settings"]) & filters.group & ~app.bl_users)
+@lang.language()
+async def settings(_, message: types.Message):
+    admin_only = await db.get_play_mode(message.chat.id)
+    cmd_delete = await db.get_cmd_delete(message.chat.id)
+    _language = await db.get_lang(message.chat.id)
+    await message.reply_text(
+        text=message.lang["start_settings"].format(message.chat.title),
+        reply_markup=buttons.settings_markup(
+            message.lang, admin_only, cmd_delete, _language, message.chat.id
+        ),
+        quote=True,
+    )
+
+
+@app.on_message(filters.new_chat_members, group=7)
+@lang.language()
+async def _new_member(_, message: types.Message):
+    if message.chat.type != enums.ChatType.SUPERGROUP:
+        return await message.chat.leave()
+
+    await asyncio.sleep(3)
+    for member in message.new_chat_members:
+        if member.id == app.id:
+            if await db.is_chat(message.chat.id):
+                return
+            await utils.send_log(message, True)
+            await db.add_chat(message.chat.id)
