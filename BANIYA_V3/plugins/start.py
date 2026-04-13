@@ -2,9 +2,8 @@
 # Licensed under the MIT License.
 # This file is part of AnonXMusic
 
-
-from pyrogram import types, enums
-
+from pyrogram import types, enums, filters
+from pyrogram.types import Message
 from BANIYA_V3 import app, config, lang
 from BANIYA_V3.core.lang import lang_codes
 
@@ -178,3 +177,62 @@ class Inline:
                 ],
             ]
         )
+
+
+# ============ START COMMAND HANDLER ============
+@app.on_message(filters.command("start") & filters.private)
+async def start_command(client, message: Message):
+    """Handler for /start command"""
+    try:
+        user = message.from_user
+        user_name = user.first_name or user.username or "User"
+        
+        # Get language
+        try:
+            from BANIYA_V3.core.lang import get_lang
+            _lang = get_lang(message.chat.id)
+        except:
+            _lang = {"welcome": "Welcome", "help": "Help", "add_me": "Add me to group"}
+        
+        # Welcome message
+        welcome_text = f"""
+**🎵 Welcome {user_name}! 🎵**
+
+**BANIYA Music Bot is here to play high-quality music in your voice chats!**
+
+**✨ Features:**
+• Play songs from YouTube
+• Queue system with controls
+• 24/7 playback
+• Multi-language support
+
+**📌 Commands:**
+• /play <song> - Play a song
+• /skip - Skip current song  
+• /pause - Pause playback
+• /resume - Resume playback
+• /stop - Stop playback
+• /help - Show all commands
+
+**🔗 Useful Links:**
+[Support Chat]({config.SUPPORT_CHAT}) | [Channel]({config.SUPPORT_CHANNEL})
+
+**🚀 Add me to your group and make me admin to start playing!**
+"""
+        
+        # Create inline keyboard
+        inline = Inline()
+        reply_markup = inline.start_key(_lang, private=True)
+        
+        await message.reply_text(
+            welcome_text,
+            reply_markup=reply_markup,
+            disable_web_page_preview=True
+        )
+        
+    except Exception as e:
+        print(f"Error in start command: {e}")
+        await message.reply_text(
+            f"**Hello {message.from_user.first_name}!**\n\nWelcome to BANIYA Music Bot!\n\nSend /help for commands."
+        )
+# ============ END START COMMAND HANDLER ============
