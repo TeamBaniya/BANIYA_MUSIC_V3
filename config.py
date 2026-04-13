@@ -30,8 +30,8 @@ class Config:
         self.SESSION3 = getenv("SESSION3", None)
 
         # 📢 Support Links
-        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/sparshupdate")
-        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/sparshsupport")
+        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/allbotsupdated")
+        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/allbotsupdated")
 
         # ⚙️ Features
         self.AUTO_LEAVE: bool = getenv("AUTO_LEAVE", "False").lower() == "true"
