@@ -30,8 +30,8 @@ class Config:
         self.SESSION3 = getenv("SESSION3", None)
 
         # 📢 Support Links
-        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/allbotsupdated")
-        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/allbotsupdated")
+        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/SCAM_0004")
+        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/SCAM_0004")
 
         # ⚙️ Features
         self.AUTO_LEAVE: bool = getenv("AUTO_LEAVE", "False").lower() == "true"
@@ -49,9 +49,9 @@ class Config:
         ]
 
         # 🖼️ Images
-        self.DEFAULT_THUMB = getenv("DEFAULT_THUMB", "https://i.ibb.co/G3JX0JJS/x.jpg")
-        self.PING_IMG = getenv("PING_IMG", "https://i.ibb.co/G3JX0JJS/x.jpg")
-        self.START_IMG = getenv("START_IMG", "https://i.ibb.co/G3JX0JJS/x.jpg")
+        self.DEFAULT_THUMB = getenv("DEFAULT_THUMB", "https://i.imgur.com/91YBfO8.jpeg")
+        self.PING_IMG = getenv("PING_IMG", "https://i.imgur.com/91YBfO8.jpeg")
+        self.START_IMG = getenv("START_IMG", "https://i.imgur.com/91YBfO8.jpeg")
 
     def check(self):
         missing = [
