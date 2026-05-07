@@ -30,8 +30,8 @@ class Config:
         self.SESSION3 = getenv("SESSION3", None)
 
         # 📢 Support Links
-        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/FucksTheFeelings")
-        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/The_destiny_word")
+        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/AURA_NETWORKS")
+        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/AURA_NETWORKS")
 
         # ⚙️ Features
         self.AUTO_LEAVE: bool = getenv("AUTO_LEAVE", "False").lower() == "true"
@@ -49,9 +49,9 @@ class Config:
         ]
 
         # 🖼️ Images
-        self.DEFAULT_THUMB = getenv("DEFAULT_THUMB", "https://i.ibb.co/4RQ6MdXc/x.jpg")
-        self.PING_IMG = getenv("PING_IMG", "https://i.ibb.co/4RQ6MdXc/x.jpg")
-        self.START_IMG = getenv("START_IMG", "https://i.ibb.co/4RQ6MdXc/x.jpg")
+        self.DEFAULT_THUMB = getenv("DEFAULT_THUMB", "https://files.catbox.moe/z3oe3f.jpg")
+        self.PING_IMG = getenv("PING_IMG", "https://files.catbox.moe/z3oe3f.jpg")
+        self.START_IMG = getenv("START_IMG", "https://files.catbox.moe/z3oe3f.jpg")
 
     def check(self):
         missing = [
