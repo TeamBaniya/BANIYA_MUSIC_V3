@@ -1,4 +1,3 @@
-cat > /root/BANIYA_MUSIC_V3/BANIYA_V3/core/bot.py << 'EOF'
 # Copyright (c) 2025 BANIYA_V3mousX1025
 # Licensed under the MIT License.
 # This file is part of AnonXMusic
@@ -48,4 +47,3 @@ class Bot(Client):
     async def exit(self):
         await super().stop()
         logger.info("✅ Bot stopped.")
-EOF
