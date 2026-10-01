@@ -135,7 +135,7 @@ class Inline:
                 [
                     self.ikb(
                         text=lang["source"],
-                        url="https://t.me/oye_sparsh_baby",
+                        url="https://t.me/MR_KALVAN",
                         style=ButtonStyle.DANGER,
                     )
                 ]
