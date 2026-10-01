@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Optional, List, Union
 
 from py_yt import Playlist, VideosSearch
-from youtubesearchpython import VideosSearch as NewVideosSearch
 
 from BANIYA_V3 import config, logger
 from BANIYA_V3.helpers import Track, utils
@@ -298,14 +297,10 @@ class YouTube:
         return None
 
     async def search(self, query: str, m_id: int, video: bool = False) -> Optional[Track]:
-        """Search for a single video/audio"""
+        """Search for a single video/audio using py_yt only"""
         try:
-            try:
-                search = NewVideosSearch(query, limit=1)
-                results = await search.next()
-            except:
-                search = VideosSearch(query, limit=1)
-                results = await search.next()
+            search = VideosSearch(query, limit=1)
+            results = await search.next()
 
             if results and results.get("result"):
                 data = results["result"][0]
