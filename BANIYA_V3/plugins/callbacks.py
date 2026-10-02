@@ -102,6 +102,34 @@ async def _controls(_, query: types.CallbackQuery):
         status = query.lang["stopped"]
         reply = query.lang["play_stopped"].format(user)
 
+    # --- NAYA: Close button ---
+    elif action == "close":
+        # VC band karo (agar chal rahi ho)
+        try:
+            await anon.stop(chat_id)
+        except Exception:
+            pass
+
+        # Purana message delete karo
+        try:
+            await query.message.delete()
+        except Exception:
+            pass
+
+        # Naya message bhejo "Closed by <user>"
+        try:
+            await app.send_message(
+                chat_id=chat_id,
+                text=query.lang.get(
+                    "play_closed",
+                    "🛑 <b>Stream closed by</b> {0}"
+                ).format(user),
+            )
+        except Exception as e:
+            print(f"[Close Button] Error: {e}")
+
+        return
+
     try:
         if action in ["skip", "replay", "stop"]:
             await query.message.reply_text(reply, quote=False)
