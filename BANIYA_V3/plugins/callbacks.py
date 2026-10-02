@@ -102,14 +102,8 @@ async def _controls(_, query: types.CallbackQuery):
         status = query.lang["stopped"]
         reply = query.lang["play_stopped"].format(user)
 
-    # --- NAYA: Close button ---
+    # --- Close button: sirf message delete, gaana NAHI roko ---
     elif action == "close":
-        # VC band karo (agar chal rahi ho)
-        try:
-            await anon.stop(chat_id)
-        except Exception:
-            pass
-
         # Purana message delete karo
         try:
             await query.message.delete()
