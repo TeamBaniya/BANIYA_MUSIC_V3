@@ -150,114 +150,88 @@ async def vplay_hndlr(
     video: bool = True,
     url: str = None,
 ) -> None:
-    """Handle video playback in voice chat"""
+    """Handle video playback in voice chat — same style as /play"""
 
-    if not hasattr(config, 'VIDEO_ALLOWED') or config.VIDEO_ALLOWED:
-        pass
-    else:
-        await m.reply_text("❌ **Video playback is disabled!**\nUse `/play` for audio only.")
-        return
+    if m.command[0].endswith("force"):
+        force = True
 
-    sent = await m.reply_text("🎬 **Searching video...**")
+    sent = await m.reply_text(m.lang["play_searching"])
     file = None
     mention = m.from_user.mention
     media = tg.get_media(m.reply_to_message) if m.reply_to_message else None
     tracks = []
-
-    if m.command[0].endswith("force"):
-        force = True
 
     if media:
         setattr(sent, "lang", m.lang)
         file = await tg.download(m.reply_to_message, sent)
 
     elif m3u8:
-        file = await tg.process_m3u8(url, sent.id, video=True)
+        file = await tg.process_m3u8(url, sent.id, video)
 
     elif url:
         if "playlist" in url:
-            await sent.edit_text("📋 **Fetching playlist...**")
+            await sent.edit_text(m.lang["playlist_fetch"])
             tracks = await yt.playlist(
-                config.PLAYLIST_LIMIT, mention, url, video=True
+                config.PLAYLIST_LIMIT, mention, url, video
             )
 
             if not tracks:
-                return await sent.edit_text("❌ Failed to fetch playlist!")
+                return await sent.edit_text(m.lang["playlist_error"])
 
             file = tracks[0]
             tracks.remove(file)
             file.message_id = sent.id
         else:
-            file = await yt.search(url, sent.id, video=True)
+            file = await yt.search(url, sent.id, video=video)
 
         if not file:
             return await sent.edit_text(
-                "❌ **Video not found!**\n\n"
-                f"Try checking the link or join @{config.SUPPORT_CHAT} for help."
+                m.lang["play_not_found"].format(config.SUPPORT_CHAT)
             )
 
     elif len(m.command) >= 2:
         query = " ".join(m.command[1:])
-        await sent.edit_text(f"🔍 **Searching:** `{query[:50]}`")
-        file = await yt.search(query, sent.id, video=True)
-
+        file = await yt.search(query, sent.id, video=video)
         if not file:
             return await sent.edit_text(
-                "❌ **No videos found!**\n\n"
-                f"Try different keywords or join @{config.SUPPORT_CHAT} for help."
+                m.lang["play_not_found"].format(config.SUPPORT_CHAT)
             )
 
     if not file:
-        return await sent.edit_text(
-            "📝 **Usage:**\n"
-            "• `/vplay <video name>`\n"
-            "• `/vplay <youtube link>`\n"
-            "• `/vplayforce <video name>` (force play)\n\n"
-            "**Example:** `/vplay Dil Chahiye`"
-        )
+        return await sent.edit_text(m.lang["play_usage"])
 
     if file.duration_sec > config.DURATION_LIMIT:
         return await sent.edit_text(
-            f"⏰ **Duration Limit Exceeded!**\n\n"
-            f"Video length: `{file.duration}`\n"
-            f"Maximum allowed: `{config.DURATION_LIMIT // 60} minutes`\n\n"
-            f"Try a shorter video."
+            m.lang["play_duration_limit"].format(config.DURATION_LIMIT // 60)
         )
 
-    # --- FIX: video=True hata diya ---
     if await db.is_logger():
         await utils.play_log(m, sent.link, file.title, file.duration)
 
     file.user = mention
-
     if force:
         queue.force_add(m.chat.id, file)
-        await sent.edit_text(
-            f"⚡ **Force Playing Video!**\n\n"
-            f"🎬 **Title:** [{file.title[:50]}]({file.url})\n"
-            f"⏱️ **Duration:** `{file.duration}`\n"
-            f"👤 **Requested by:** {m.from_user.mention}",
-        )
     else:
         position = queue.add(m.chat.id, file)
 
         if position != 0 or await db.get_call(m.chat.id):
             await sent.edit_text(
-                f"📌 **Queued at position:** `#{position}`\n\n"
-                f"🎬 **Title:** [{file.title[:50]}]({file.url})\n"
-                f"⏱️ **Duration:** `{file.duration}`\n"
-                f"👤 **Requested by:** {m.from_user.mention}\n\n"
-                f"_Use /playnow to skip to this video_",
+                m.lang["play_queued"].format(
+                    position,
+                    file.url,
+                    file.title,
+                    file.duration,
+                    m.from_user.mention,
+                ),
                 reply_markup=buttons.play_queued(
-                    m.chat.id, file.id, "Play Now"
+                    m.chat.id, file.id, m.lang["play_now"]
                 ),
             )
-
             if tracks:
                 added = playlist_to_queue(m.chat.id, tracks)
                 await app.send_message(
                     chat_id=m.chat.id,
-                    text=f"📋 **Playlist added:** `{len(tracks)}` videos\n\n" + added,
+                    text=m.lang["playlist_queued"].format(len(tracks)) + added,
                 )
             return
 
@@ -266,55 +240,19 @@ async def vplay_hndlr(
         if Path(fname).exists() and Path(fname).stat().st_size > 0:
             file.file_path = fname
         else:
-            await sent.edit_text(f"📥 **Downloading video:** `{file.title[:40]}`...")
+            await sent.edit_text(m.lang["play_downloading"])
             file.file_path = await yt.download(file.id, video=True)
 
             if not file.file_path:
-                await sent.edit_text(
-                    "❌ **Download Failed!**\n\n"
-                    "The video might be too large or blocked.\n"
-                    "Try another video or use `/play` for audio only."
+                return await sent.edit_text(
+                    m.lang["error_no_file"].format(config.SUPPORT_CHAT)
                 )
-                return
-
-    await sent.edit_text(
-        f"🎬 **Now Playing Video!**\n\n"
-        f"**Title:** [{file.title[:50]}]({file.url})\n"
-        f"**Duration:** `{file.duration}`\n"
-        f"**Requested by:** {m.from_user.mention}\n\n"
-        f"_Use /stop to stop playback_",
-    )
 
     await anon.play_media(chat_id=m.chat.id, message=sent, media=file)
-
     if not tracks:
         return
-
     added = playlist_to_queue(m.chat.id, tracks)
     await app.send_message(
         chat_id=m.chat.id,
-        text=f"📋 **Playlist queued:** `{len(tracks)}` videos\n\n" + added,
-    )
-
-
-# ========== HELP COMMAND UPDATE ==========
-@app.on_message(filters.command("vhelp") & filters.group & ~app.bl_users)
-@lang.language()
-async def vhelp_handler(_, m: types.Message):
-    await m.reply_text(
-        "🎬 **Video Playback Commands**\n\n"
-        "**Play Video:**\n"
-        "• `/vplay <video name>` - Search and play video\n"
-        "• `/vplay <youtube link>` - Play video from link\n"
-        "• `/vplayforce` - Force play (skips queue)\n\n"
-        "**Control:**\n"
-        "• `/vstop` - Stop video playback\n"
-        "• `/vpause` - Pause video\n"
-        "• `/vresume` - Resume video\n"
-        "• `/vskip` - Skip current video\n\n"
-        "**Queue:**\n"
-        "• `/vqueue` - Show video queue\n"
-        "• `/vclear` - Clear queue\n\n"
-        f"**Support:** @{config.SUPPORT_CHAT}\n"
-        f"**Channel:** @{config.CHANNEL}",
+        text=m.lang["playlist_queued"].format(len(tracks)) + added,
     )
