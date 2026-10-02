@@ -78,7 +78,7 @@
     "play_next": "<emoji id='5382194935057372936'>⏱️</emoji> Hold on...\n\n<emoji id='5443127283898405358'>📥</emoji> Downloading next media from the queue.",
     "play_invite": "<emoji id='5382194935057372936'>⏱️</emoji> Hold on a moment...\n\n<emoji id='5453957997418004470'>👥</emoji> Inviting {0} assistant to your chat.",
     "play_searching": "<emoji id='6136178002943290170'>🔍</emoji>",
-    "play_downloading": "<emoji id='6136178002943290170'>🔍</emoji>",
+    "play_downloading": "<emoji id='6136178002943290170'>🔍</emoji> Downloading ",
     "play_paused": "<emoji id='5456327427795982532'>🪶</emoji> <b>Stream paused by</b> {0}",
     "play_resumed": "<emoji id='5456327427795982532'>🪶</emoji> <b>Stream resumed by</b> {0}",
     "play_replayed": "<emoji id='5456327427795982532'>🪶</emoji> <b>Stream replayed by</b> {0}",
