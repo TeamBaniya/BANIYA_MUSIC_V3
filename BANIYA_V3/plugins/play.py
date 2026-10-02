@@ -147,38 +147,33 @@ async def vplay_hndlr(
     m: types.Message,
     force: bool = False,
     m3u8: bool = False,
-    video: bool = True,  # Changed to True for video
+    video: bool = True,
     url: str = None,
 ) -> None:
     """Handle video playback in voice chat"""
-    
-    # Check if video is enabled in config
+
     if not hasattr(config, 'VIDEO_ALLOWED') or config.VIDEO_ALLOWED:
         pass
     else:
         await m.reply_text("❌ **Video playback is disabled!**\nUse `/play` for audio only.")
         return
-    
+
     sent = await m.reply_text("🎬 **Searching video...**")
     file = None
     mention = m.from_user.mention
     media = tg.get_media(m.reply_to_message) if m.reply_to_message else None
     tracks = []
 
-    # Check if command is force version
     if m.command[0].endswith("force"):
         force = True
 
-    # Handle media from reply
     if media:
         setattr(sent, "lang", m.lang)
         file = await tg.download(m.reply_to_message, sent)
 
-    # Handle m3u8 streams
     elif m3u8:
         file = await tg.process_m3u8(url, sent.id, video=True)
 
-    # Handle URL or playlist
     elif url:
         if "playlist" in url:
             await sent.edit_text("📋 **Fetching playlist...**")
@@ -201,15 +196,11 @@ async def vplay_hndlr(
                 f"Try checking the link or join @{config.SUPPORT_CHAT} for help."
             )
 
-    # Handle search query
     elif len(m.command) >= 2:
         query = " ".join(m.command[1:])
-        
-        # Show searching status
         await sent.edit_text(f"🔍 **Searching:** `{query[:50]}`")
-        
         file = await yt.search(query, sent.id, video=True)
-        
+
         if not file:
             return await sent.edit_text(
                 "❌ **No videos found!**\n\n"
@@ -225,7 +216,6 @@ async def vplay_hndlr(
             "**Example:** `/vplay Dil Chahiye`"
         )
 
-    # Check duration limit
     if file.duration_sec > config.DURATION_LIMIT:
         return await sent.edit_text(
             f"⏰ **Duration Limit Exceeded!**\n\n"
@@ -234,14 +224,12 @@ async def vplay_hndlr(
             f"Try a shorter video."
         )
 
-    # Log to logger group if enabled
+    # --- FIX: video=True hata diya ---
     if await db.is_logger():
-        await utils.play_log(m, sent.link, file.title, file.duration, video=True)
+        await utils.play_log(m, sent.link, file.title, file.duration)
 
-    # Set user mention
     file.user = mention
-    
-    # Add to queue
+
     if force:
         queue.force_add(m.chat.id, file)
         await sent.edit_text(
@@ -249,12 +237,10 @@ async def vplay_hndlr(
             f"🎬 **Title:** [{file.title[:50]}]({file.url})\n"
             f"⏱️ **Duration:** `{file.duration}`\n"
             f"👤 **Requested by:** {m.from_user.mention}",
-            disable_web_page_preview=True
         )
     else:
         position = queue.add(m.chat.id, file)
 
-        # If position != 0 or call is active, add to queue
         if position != 0 or await db.get_call(m.chat.id):
             await sent.edit_text(
                 f"📌 **Queued at position:** `#{position}`\n\n"
@@ -265,20 +251,16 @@ async def vplay_hndlr(
                 reply_markup=buttons.play_queued(
                     m.chat.id, file.id, "Play Now"
                 ),
-                disable_web_page_preview=True
             )
-            
-            # Add playlist tracks to queue
+
             if tracks:
                 added = playlist_to_queue(m.chat.id, tracks)
                 await app.send_message(
                     chat_id=m.chat.id,
                     text=f"📋 **Playlist added:** `{len(tracks)}` videos\n\n" + added,
-                    disable_web_page_preview=True
                 )
             return
 
-    # Download video if not already downloaded
     if not file.file_path:
         fname = f"downloads/{file.id}.mp4"
         if Path(fname).exists() and Path(fname).stat().st_size > 0:
@@ -286,8 +268,7 @@ async def vplay_hndlr(
         else:
             await sent.edit_text(f"📥 **Downloading video:** `{file.title[:40]}`...")
             file.file_path = await yt.download(file.id, video=True)
-            
-            # Check if download failed
+
             if not file.file_path:
                 await sent.edit_text(
                     "❌ **Download Failed!**\n\n"
@@ -296,27 +277,23 @@ async def vplay_hndlr(
                 )
                 return
 
-    # Play the video
     await sent.edit_text(
         f"🎬 **Now Playing Video!**\n\n"
         f"**Title:** [{file.title[:50]}]({file.url})\n"
         f"**Duration:** `{file.duration}`\n"
         f"**Requested by:** {m.from_user.mention}\n\n"
         f"_Use /stop to stop playback_",
-        disable_web_page_preview=True
     )
-    
+
     await anon.play_media(chat_id=m.chat.id, message=sent, media=file)
-    
-    # Add playlist tracks to queue after current video
+
     if not tracks:
         return
-    
+
     added = playlist_to_queue(m.chat.id, tracks)
     await app.send_message(
         chat_id=m.chat.id,
         text=f"📋 **Playlist queued:** `{len(tracks)}` videos\n\n" + added,
-        disable_web_page_preview=True
     )
 
 
@@ -324,7 +301,6 @@ async def vplay_hndlr(
 @app.on_message(filters.command("vhelp") & filters.group & ~app.bl_users)
 @lang.language()
 async def vhelp_handler(_, m: types.Message):
-    """Help command for video playback"""
     await m.reply_text(
         "🎬 **Video Playback Commands**\n\n"
         "**Play Video:**\n"
@@ -341,5 +317,4 @@ async def vhelp_handler(_, m: types.Message):
         "• `/vclear` - Clear queue\n\n"
         f"**Support:** @{config.SUPPORT_CHAT}\n"
         f"**Channel:** @{config.CHANNEL}",
-        disable_web_page_preview=True
     )
