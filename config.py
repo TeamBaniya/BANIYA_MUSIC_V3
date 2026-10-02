@@ -30,8 +30,8 @@ class Config:
         self.SESSION3 = getenv("SESSION3", None)
 
         # 📢 Support Links
-        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/AURA_NETWORKS")
-        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/AURA_NETWORKS")
+        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/Tamilchat_TP")
+        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/Tamilchat7s")
 
         # ⚙️ Features
         self.AUTO_LEAVE: bool = getenv("AUTO_LEAVE", "False").lower() == "true"
