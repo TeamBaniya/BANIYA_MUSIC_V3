@@ -32,6 +32,7 @@ class Inline:
             )
 
         if not remove:
+            # Normal controls row (5 buttons)
             keyboard.append(
                 [
                     self.ikb("▷", callback_data=f"controls resume {chat_id}", style=ButtonStyle.SUCCESS),
@@ -39,6 +40,19 @@ class Inline:
                     self.ikb("⥁", callback_data=f"controls replay {chat_id}", style=ButtonStyle.DEFAULT),
                     self.ikb("‣‣I", callback_data=f"controls skip {chat_id}", style=ButtonStyle.PRIMARY),
                     self.ikb("▢", callback_data=f"controls stop {chat_id}", style=ButtonStyle.DANGER),
+                ]
+            )
+            # Naya Close row (1 button — full width)
+            keyboard.append(
+                [
+                    self.ikb("✖️ Close", callback_data=f"controls close {chat_id}", style=ButtonStyle.DANGER),
+                ]
+            )
+        else:
+            # Agar remove=True hai (stream band ho gaya), tab bhi Close button dikhaye
+            keyboard.append(
+                [
+                    self.ikb("✖️ Close", callback_data=f"controls close {chat_id}", style=ButtonStyle.DANGER),
                 ]
             )
 
