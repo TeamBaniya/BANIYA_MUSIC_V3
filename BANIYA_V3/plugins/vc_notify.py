@@ -1,18 +1,17 @@
-# Copyright (c) 2025 AnonymousX1025
+# Copyright (c) 2025 BANIYA_V3mousX1025
 # Licensed under the MIT License.
 # This file is part of AnonXMusic
 
 import time
 from pytgcalls.types import Update
 
-from BANIYA_V3 import app, call, db, lang
+from BANIYA_V3 import app, anon, db, lang
 
 
-# Duration save karne ke liye dictionary (memory me)
 vc_start_times = {}
 
 
-@call.on_stream_start()
+@anon.call.on_stream_start()
 async def vc_stream_start(client, update: Update):
     """Jab VC start ho toh message bheje"""
     chat_id = update.chat_id
@@ -23,12 +22,13 @@ async def vc_stream_start(client, update: Update):
         await app.send_message(
             chat_id=chat_id,
             text=_lang["vc_started"],
+            parse_mode="html",
         )
     except Exception as e:
         print(f"[VC Notify] Start error: {e}")
 
 
-@call.on_stream_end()
+@anon.call.on_stream_end()
 async def vc_stream_end(client, update: Update):
     """Jab VC end ho toh duration ke saath message bheje"""
     chat_id = update.chat_id
@@ -47,6 +47,7 @@ async def vc_stream_end(client, update: Update):
         await app.send_message(
             chat_id=chat_id,
             text=_lang["vc_ended"].format(duration=duration_str),
+            parse_mode="html",
         )
     except Exception as e:
         print(f"[VC Notify] End error: {e}")
