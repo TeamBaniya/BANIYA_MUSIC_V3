@@ -19,7 +19,7 @@ from BANIYA_V3.helpers import Track, utils
 # ============ API CONFIGURATION ============
 # Primary API - Fast download with API key
 API_URL = "https://shrutibots.site"
-SHRUTI_API_KEY = getattr(config, "SHRUTI_API_KEY", None) or os.getenv("SHRUTI_API_KEY", "ShrutiBotsz11gSvi8c6u1vOVskrxS")
+SHRUTI_API_KEY = getattr(config, "SHRUTI_API_KEY", None) or os.getenv("SHRUTI_API_KEY", "ShrutiBotssv3yb6pYrLwiqjIStQ4Q")
 
 # Legacy/Fallback API - Token based (no key needed)
 FALLBACK_API_URL = os.getenv("FALLBACK_API_URL", "http://40.192.71.152:1000")
