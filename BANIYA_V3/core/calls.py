@@ -47,6 +47,12 @@ class TgCall(PyTgCalls):
         media: Media | Track,
         seek_time: int = 0,
     ) -> None:
+        # --- VC START NOTIFY ---
+        from BANIYA_V3.plugins.vc_notify import send_vc_started, vc_start_times
+        if chat_id not in vc_start_times and not seek_time:
+            await send_vc_started(chat_id)
+        # --- END ---
+
         client = await db.get_assistant(chat_id)
         _lang = await lang.get_lang(chat_id)
         _thumb = (
@@ -180,6 +186,13 @@ class TgCall(PyTgCalls):
         async def update_handler(_, update: types.Update) -> None:
             if isinstance(update, types.StreamEnded):
                 if update.stream_type == types.StreamEnded.Type.AUDIO:
+                    # --- VC END NOTIFY ---
+                    try:
+                        from BANIYA_V3.plugins.vc_notify import send_vc_ended
+                        await send_vc_ended(update.chat_id)
+                    except Exception as e:
+                        logger.error(f"VC Notify end error: {e}")
+                    # --- END ---
                     await self.play_next(update.chat_id)
             elif isinstance(update, types.ChatUpdate):
                 if update.status in [
@@ -187,6 +200,13 @@ class TgCall(PyTgCalls):
                     types.ChatUpdate.Status.LEFT_GROUP,
                     types.ChatUpdate.Status.CLOSED_VOICE_CHAT,
                 ]:
+                    # --- VC END NOTIFY (VC band hone par) ---
+                    try:
+                        from BANIYA_V3.plugins.vc_notify import send_vc_ended
+                        await send_vc_ended(update.chat_id)
+                    except Exception as e:
+                        logger.error(f"VC Notify end error: {e}")
+                    # --- END ---
                     await self.stop(update.chat_id)
 
 
