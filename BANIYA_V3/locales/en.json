@@ -3,6 +3,7 @@
     "admin_required": "<emoji id='5258021679568789405'>👮</emoji> Bot requires the <b>invite users via link</b> permission to work.",
     "admin_cache_wait": "<emoji id='5382194935057372936'>⏱️</emoji> You can only refresh the admin cache once every 10 minutes.",
     "admin_cache_reloading": "<emoji id='5017470156276761427'>🔄</emoji> Reloading admin cache...",
+    "play_closed": "<emoji id='5440543624846671490'>🛑</emoji> <b>Stream closed by</b> {0} ",
     "admin_cache_reloaded": "<emoji id='5208880351690112495'>✅</emoji> Admin cache refreshed successfully!",
     "auth_added": "<emoji id='5258011929993026890'>👤</emoji> Added {0} to the authorized users list.",
     "auth_removed": "<emoji id='5440708482871361360'>🚫</emoji> Removed {0} from the authorized users list.",
