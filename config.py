@@ -20,9 +20,9 @@ class Config:
         self.OWNER_ID = int(getenv("OWNER_ID", 0))
 
         # 🎵 Limits
-        self.DURATION_LIMIT = int(getenv("DURATION_LIMIT", 60)) * 120
-        self.QUEUE_LIMIT = int(getenv("QUEUE_LIMIT", 20))
-        self.PLAYLIST_LIMIT = int(getenv("PLAYLIST_LIMIT", 20))
+        self.DURATION_LIMIT = int(getenv("DURATION_LIMIT", 60)) * 1200
+        self.QUEUE_LIMIT = int(getenv("QUEUE_LIMIT", 30))
+        self.PLAYLIST_LIMIT = int(getenv("PLAYLIST_LIMIT", 30))
 
         # 🤖 Assistant Sessions
         self.SESSION1 = getenv("SESSION", None)
