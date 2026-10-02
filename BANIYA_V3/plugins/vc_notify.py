@@ -3,6 +3,7 @@
 # This file is part of AnonXMusic
 
 import time
+from pyrogram import enums
 from BANIYA_V3 import app, lang
 
 
@@ -10,21 +11,19 @@ vc_start_times = {}
 
 
 async def send_vc_started(chat_id: int) -> None:
-    """VC start hone par message bhejta hai"""
     vc_start_times[chat_id] = time.time()
     try:
         _lang = await lang.get_lang(chat_id)
         await app.send_message(
             chat_id=chat_id,
             text=_lang["vc_started"],
-            parse_mode="html",
+            parse_mode=enums.ParseMode.HTML,   # <-- FIX
         )
     except Exception as e:
         print(f"[VC Notify] Start error: {e}")
 
 
 async def send_vc_ended(chat_id: int) -> None:
-    """VC end hone par duration ke saath message bhejta hai"""
     if chat_id not in vc_start_times:
         return
 
@@ -39,7 +38,7 @@ async def send_vc_ended(chat_id: int) -> None:
         await app.send_message(
             chat_id=chat_id,
             text=_lang["vc_ended"].format(duration=duration_str),
-            parse_mode="html",
+            parse_mode=enums.ParseMode.HTML,   # <-- FIX
         )
     except Exception as e:
         print(f"[VC Notify] End error: {e}")
