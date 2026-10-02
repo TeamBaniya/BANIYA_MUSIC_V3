@@ -11,7 +11,7 @@ from BANIYA_V3 import app, anon, db, lang
 vc_start_times = {}
 
 
-@anon.call.on_stream_start()
+@anon.calls.on_stream_start()
 async def vc_stream_start(client, update: Update):
     """Jab VC start ho toh message bheje"""
     chat_id = update.chat_id
@@ -28,7 +28,7 @@ async def vc_stream_start(client, update: Update):
         print(f"[VC Notify] Start error: {e}")
 
 
-@anon.call.on_stream_end()
+@anon.calls.on_stream_end()
 async def vc_stream_end(client, update: Update):
     """Jab VC end ho toh duration ke saath message bheje"""
     chat_id = update.chat_id
