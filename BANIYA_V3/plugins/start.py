@@ -3,6 +3,7 @@
 # This file is part of AnonXMusic
 
 import asyncio
+import os
 from pyrogram import enums, filters, types
 
 from BANIYA_V3 import app, config, db, lang
@@ -35,11 +36,29 @@ async def start(_, message: types.Message):
     )
 
     key = buttons.start_key(message.lang, private)
-    await message.reply_photo(
-        photo="start.jpg",   # <-- Root folder se image
-        caption=_text,
-        reply_markup=key,
-    )
+
+    # start.jpg ka absolute path banao
+    photo_path = os.path.join(os.getcwd(), "start.jpg")
+
+    try:
+        if os.path.exists(photo_path):
+            await message.reply_photo(
+                photo=photo_path,
+                caption=_text,
+                reply_markup=key,
+            )
+        else:
+            # File nahi mili toh text fallback
+            await message.reply_text(
+                text=_text,
+                reply_markup=key,
+            )
+    except Exception as e:
+        print(f"[START] reply_photo failed: {e}")
+        await message.reply_text(
+            text=_text,
+            reply_markup=key,
+        )
 
     if private:
         if await db.is_user(message.from_user.id):
