@@ -48,7 +48,7 @@ async def start(_, message: types.Message):
                 reply_markup=key,
             )
         else:
-            # File nahi mili toh text fallback
+            print(f"[START] start.jpg not found at: {photo_path}")
             await message.reply_text(
                 text=_text,
                 reply_markup=key,
